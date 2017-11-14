@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>.Net on My personal notes</title>
+    <link>https://voloda.github.io/test/tags/.net/</link>
+    <description>Recent content in .Net on My personal notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 02 Jan 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://voloda.github.io/test/tags/.net/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>First post on this topic</title>
+      <link>https://voloda.github.io/test/2017/01/first-post-on-this-topic/</link>
+      <pubDate>Mon, 02 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://voloda.github.io/test/2017/01/first-post-on-this-topic/</guid>
+      <description>hello lorem ipsum
+ aaa  bb   xx</description>
+    </item>
+    
+  </channel>
+</rss>
