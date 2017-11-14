@@ -106,7 +106,7 @@ For some time I thought that Visual Studio installation for somehow corrupted on
     <h2 class="blog-post-title"><a href="https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></h2>
     <p class="blog-post-meta"><time datetime="2014-12-18T00:00:00Z">Thu Dec 18, 2014</time> by Voloda in 
 
-<i class="fa fa-tag" aria-hidden="true"></i>&nbsp;<a href="../../../test/tags/development" rel="tag">development</a>, <a href="../../../test/tags/dotnet" rel="tag">dotNET</a>
+<i class="fa fa-tag" aria-hidden="true"></i>&nbsp;<a href="/test/tags/development" rel="tag">development</a>, <a href="/test/tags/dotnet" rel="tag">dotNET</a>
 
 </p>
   </header>
@@ -119,16 +119,16 @@ For some time I thought that Visual Studio installation for somehow corrupted on
 <p>Today I really wanted to attach to a process to see what is going on inside and the issue happened again.</p>
 
 <p>After a bit of playing I realized that in the case that debugger works after attaching correctly the &lsquo;Attach to Process&rsquo; Visual Studio dialog looks like this (see &lsquo;Attach to&rsquo; field):
-<img src="../../../img/visual-studio/visual_studio_debugger_does_recognize_process_type.png" alt="visual_studio_debugger_does_recognize_process_type.png" /></p>
+<img src="/img/visual-studio/visual_studio_debugger_does_recognize_process_type.png" alt="visual_studio_debugger_does_recognize_process_type.png" /></p>
 
 <p>For my process it didn&rsquo;t work this time and &lsquo;Attach to Process&rsquo; dialog looked like this (again see &lsquo;Attach to&rsquo; field):
-<img src="../../../img/visual-studio/visual_studio_debugger_does_not_recognize_process_type.png" alt="visual_studio_debugger_does_not_recognize_process_type.png" /></p>
+<img src="/img/visual-studio/visual_studio_debugger_does_not_recognize_process_type.png" alt="visual_studio_debugger_does_not_recognize_process_type.png" /></p>
 
 <p>Apparently Visual Studio in some cases does not properly detect the type of the process and does not use correct debugger settings.</p>
 
 <p>In order to solve my issue I finally found the &lsquo;Select&hellip;&rsquo; button following &lsquo;Attach to&rsquo; field where you can disable automatic detection of the process type and manually select a different one.</p>
 
-<p><img src="../../../img/visual-studio/visual_studio_debugger_does_not_recognize_process_select_code_type.png" alt="visual_studio_debugger_does_not_recognize_process_select_code_type.png " /></p>
+<p><img src="/img/visual-studio/visual_studio_debugger_does_not_recognize_process_select_code_type.png" alt="visual_studio_debugger_does_not_recognize_process_select_code_type.png " /></p>
 
 <p>After selecting &lsquo;Manager (v4.5, 4.0)&rsquo; and attaching debugger to process again everything worked well.</p>
 
@@ -176,9 +176,9 @@ For some time I thought that Visual Studio installation for somehow corrupted on
     <ol class="list-unstyled">
 
 
-<li><a href="../../../test/2017/11/something-about-git/">Something about git</a></li>
+<li><a href="/test/2017/11/something-about-git/">Something about git</a></li>
 
-<li><a href="../../../test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></li>
+<li><a href="/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></li>
 
     </ol>
   </section>
