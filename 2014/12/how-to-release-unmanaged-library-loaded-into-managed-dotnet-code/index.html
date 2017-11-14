@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta property="og:title" content="How to release unmanaged library loaded into managed .NET code" />
+<meta property="og:description" content="Motivation I had found this article on how to release DLL library already loaded into the process using P-Invoke. It uses LoadLibrary() and FreeLibrary() WINAPI calls to achieve this.
+And what is wrong with it?
+It forces to unload ALL instances of the DLL library currently loaded within process. Which means, that in the case you have more than one instance of the class using these external functions ALL these will stop working!" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://voloda.github.io/test/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/" />
+
+
+
+<meta property="article:published_time" content="2014-12-03T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2014-12-03T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="How to release unmanaged library loaded into managed .NET code"/>
+<meta name="twitter:description" content="Motivation I had found this article on how to release DLL library already loaded into the process using P-Invoke. It uses LoadLibrary() and FreeLibrary() WINAPI calls to achieve this.
+And what is wrong with it?
+It forces to unload ALL instances of the DLL library currently loaded within process. Which means, that in the case you have more than one instance of the class using these external functions ALL these will stop working!"/>
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+    
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How to release unmanaged library loaded into managed .NET code",
+  "url": "https://voloda.github.io/test/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/",
+  "wordCount": "502",
+  "datePublished": "2014-12-03T00:00:00&#43;00:00",
+  "dateModified": "2014-12-03T00:00:00&#43;00:00",
+  "author": {
+    "@type": "Person",
+    "name": "Voloda"
+  },
+  "keywords": "development, dotNET"
+}
+</script>
+
+
+
+    <link rel="canonical" href="https://voloda.github.io/test/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/">
+
+    <title>How to release unmanaged library loaded into managed .NET code | My personal notes</title>
+
+    <!-- combined, minified CSS -->
+    <link href="https://voloda.github.io/test/css/style.css" rel="stylesheet" integrity="sha384-O8wjsnz02XiyrPxnhfF6AVOv6YLBaEGRCnVF&#43;DL3gCPBy9cieyHcpixIrVyD2JS5" crossorigin="anonymous">
+
+    
+
+    
+
+    
+
+    
+
+  </head>
+
+  <body>
+
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="nav blog-nav">
+          <a class="nav-link " href="https://voloda.github.io/test/">Home</a>
+          
+          
+          <a class="nav-link" href="https://voloda.github.io/test/tutorials/chocolatey-setup-on-dev-machine-and-useful-packages/">Chocolatey setup on DEV machine &#43; useful packages</a>
+          
+          
+        </nav>
+      </div>
+    </div>
+
+    <header class="blog-header">
+      <div class="container">
+        <h1 class="blog-title"><a href="https://voloda.github.io/test/" rel="home">My personal notes</a></h1>
+        <p class="lead blog-description">My personal notes on various topics</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+
+          
+
+
+<article class="blog-post">
+  <header>
+    <h2 class="blog-post-title"><a href="https://voloda.github.io/test/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/">How to release unmanaged library loaded into managed .NET code</a></h2>
+    <p class="blog-post-meta"><time datetime="2014-12-03T00:00:00Z">Wed Dec 3, 2014</time> by Voloda in 
+
+<i class="fa fa-tag" aria-hidden="true"></i>&nbsp;<a href="../../../test/tags/development" rel="tag">development</a>, <a href="../../../test/tags/dotnet" rel="tag">dotNET</a>
+
+</p>
+  </header>
+  
+
+<h1 id="motivation">Motivation</h1>
+
+<p>I had found this article on how to release DLL library already loaded into the process using P-Invoke. It uses <code>LoadLibrary()</code> and <code>FreeLibrary()</code> WINAPI calls to achieve this.</p>
+
+<p>And what is wrong with it?</p>
+
+<p>It forces to unload ALL instances of the DLL library currently loaded within process. Which means, that in the case you have more than one instance of the class using these external functions ALL these will stop working!</p>
+
+<p>And that is not all - you cannot use this DLL in same application domain again after unloading.</p>
+
+<h1 id="solution">Solution</h1>
+
+<p>Solution is pretty simple one, but I have to say that it wasn&rsquo;t very obvious to me at the beginning.
+You can use P-Invoke to import following standard WinAPI functions for dynamical function loading:</p>
+
+<ul>
+<li><code>LoadLibrary()</code></li>
+<li><code>FreeLibrary()</code></li>
+<li><code>GetProcAddress()</code></li>
+</ul>
+
+<p>We will use following wrapping class:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UnsafeMethods</span>
+{<span style="color:#a6e22e">
+</span><span style="color:#a6e22e">    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]</span>
+    <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">static</span> IntPtr LoadLibrary(<span style="color:#66d9ef">string</span> libraryName);<span style="color:#a6e22e">
+</span><span style="color:#a6e22e">    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]</span>
+    <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">bool</span> FreeLibrary(IntPtr hModule);<span style="color:#a6e22e">
+</span><span style="color:#a6e22e">    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]</span>
+    <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">static</span> IntPtr GetProcAddress(IntPtr hModule, <span style="color:#66d9ef">string</span> procName);
+}</code></pre></div>
+<p>We also need signatures of imported functions - we will convert them into delegates (following ones come from sample project):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#75715e">// int multiply(int value1, int value2);
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">delegate</span> <span style="color:#66d9ef">int</span> MultiplyDelegate(<span style="color:#66d9ef">int</span> value1, <span style="color:#66d9ef">int</span> value2);
+<span style="color:#75715e">// int str2int(const char *input);
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">delegate</span> <span style="color:#66d9ef">int</span> Str2IntDelegate(<span style="color:#a6e22e">[MarshalAs(UnmanagedType.LPStr)]</span><span style="color:#66d9ef">string</span> source);</code></pre></div>
+<p>Now we can create implement our class calling external DLL functionality with <code>IDisposable</code> interface so it will automatically release used DLL library when it will go out-of-scope or it will be finalized (in example project are two functions which we will publish as <code>Multiply()</code> and <code>Str2Int()</code>).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ExternalHelpers</span>: IDisposable
+{
+    <span style="color:#75715e">#region Private members
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> IntPtr _libraryHandle;
+    <span style="color:#66d9ef">private</span> MultiplyDelegate _multiply;
+    <span style="color:#66d9ef">private</span> Str2IntDelegate _str2Int;
+    <span style="color:#75715e">#endregion
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">#region External functions delegates
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// int multiply(int value1, int value2);
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">delegate</span> <span style="color:#66d9ef">int</span> MultiplyDelegate(<span style="color:#66d9ef">int</span> value1, <span style="color:#66d9ef">int</span> value2);
+    <span style="color:#75715e">// int str2int(const char *input);
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">delegate</span> <span style="color:#66d9ef">int</span> Str2IntDelegate(<span style="color:#a6e22e">[MarshalAs(UnmanagedType.LPStr)]</span><span style="color:#66d9ef">string</span> source);
+    <span style="color:#75715e">#endregion
+</span><span style="color:#75715e"></span>
+    <span style="color:#66d9ef">public</span> ExternalHelpers()
+    {
+        <span style="color:#75715e">// dynamically load DLL using WinAPI
+</span><span style="color:#75715e"></span>        _libraryHandle = UnsafeMethods.LoadLibrary(<span style="color:#e6db74">@&#34;testing.dll&#34;</span>);
+
+        <span style="color:#66d9ef">if</span> (_libraryHandle == IntPtr.Zero)
+            Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+        <span style="color:#75715e">// import functions as delegates using GetProcAddress
+</span><span style="color:#75715e"></span>        _multiply = LoadExternalFunction&lt;MultiplyDelegate&gt;(<span style="color:#e6db74">@&#34;multiply&#34;</span>);
+        _str2Int = LoadExternalFunction&lt;Str2IntDelegate&gt;(<span style="color:#e6db74">@&#34;str2int&#34;</span>);
+    }
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> Multiply(<span style="color:#66d9ef">int</span> value1, <span style="color:#66d9ef">int</span> value2)
+    {
+        <span style="color:#75715e">// call method using delegate
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> _multiply(value1, value2);
+    }
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> Str2Int(<span style="color:#66d9ef">string</span> source)
+    {
+        <span style="color:#75715e">// call method using delegate
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> _str2Int(source);
+    }
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> Dispose()
+    {
+        Dispose(<span style="color:#66d9ef">true</span>);
+
+        GC.SuppressFinalize(<span style="color:#66d9ef">this</span>);
+    }
+
+    ~ExternalHelpers()
+    {
+        Dispose(<span style="color:#66d9ef">false</span>);
+    }
+
+    <span style="color:#75715e">#region Private helper methods
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> T LoadExternalFunction&lt;T&gt;(<span style="color:#66d9ef">string</span> functionName)
+        <span style="color:#66d9ef">where</span> T: <span style="color:#66d9ef">class</span>
+    {
+        Debug.Assert(!String.IsNullOrEmpty(functionName));
+        <span style="color:#75715e">// load function pointer
+</span><span style="color:#75715e"></span>        IntPtr functionPointer = UnsafeMethods.GetProcAddress(_libraryHandle, functionName);
+
+        <span style="color:#66d9ef">if</span> (functionPointer == IntPtr.Zero)
+            Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+        <span style="color:#75715e">// Marshal to requested delegate
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> Marshal.GetDelegateForFunctionPointer(functionPointer, <span style="color:#66d9ef">typeof</span>(T)) <span style="color:#66d9ef">as</span> T;
+    }
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> Dispose(<span style="color:#66d9ef">bool</span> disposing)
+    {
+        <span style="color:#66d9ef">if</span> (disposing)
+        {
+            _multiply = <span style="color:#66d9ef">null</span>;
+            _str2Int = <span style="color:#66d9ef">null</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (_libraryHandle != IntPtr.Zero)
+        {
+            <span style="color:#66d9ef">if</span> (!UnsafeMethods.FreeLibrary(_libraryHandle))
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+
+            _libraryHandle = IntPtr.Zero;
+        }
+    }
+    <span style="color:#75715e">#endregion
+</span><span style="color:#75715e"></span>}</code></pre></div>
+<p>And finally - we can use it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> Main(<span style="color:#66d9ef">string</span><span style="color:#a6e22e">[]</span> args)
+{
+    using(ExternalHelpers e = <span style="color:#66d9ef">new</span> ExternalHelpers())
+    {
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> value1 = <span style="color:#ae81ff">2</span>;
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> value2 = <span style="color:#ae81ff">3</span>;
+        <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">string</span> strValue = <span style="color:#e6db74">&#34;345&#34;</span>;
+
+        Console.WriteLine(<span style="color:#e6db74">&#34;{0} * {1} = {2}&#34;</span>, value1, value2, e.Multiply(value1, value2));
+        Console.WriteLine(<span style="color:#e6db74">&#34;{0} =&gt; {1}&#34;</span>, strValue, e.Str2Int(strValue));
+    }
+
+    Console.ReadKey();
+}</code></pre></div>
+<p>Looks easy? Yes it is :-)</p>
+
+<h1 id="links">Links</h1>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/">MSDN</a></li>
+</ul>
+
+
+  
+
+  
+  <hr>
+  <footer>
+
+  
+    <section>
+    <h4>Share</h4>
+    <nav class="nav sharing-icons">
+      <a class="nav-item" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fhow-to-release-unmanaged-library-loaded-into-managed-dotnet-code%2f" title="Share on Facebook"><span class="fa fa-facebook fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://plus.google.com/share?url=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fhow-to-release-unmanaged-library-loaded-into-managed-dotnet-code%2f" title="Share on Google+"><span class="fa fa-google-plus fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fhow-to-release-unmanaged-library-loaded-into-managed-dotnet-code%2f" title="Share on LinkedIn"><span class="fa fa-linkedin fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://twitter.com/home?status=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fhow-to-release-unmanaged-library-loaded-into-managed-dotnet-code%2f" title="Tweet this"><span class="fa fa-twitter fa-2x"></span></a>
+    </nav>
+  </section>
+
+  
+
+  
+  </footer>
+  
+
+</article> 
+
+
+
+        </div> <!-- /.blog-main -->
+
+        <aside class="col-sm-3 ml-auto blog-sidebar">
+  
+  <section class="sidebar-module sidebar-module-inset">
+    <h4>About</h4>
+    <p>My personal notes</p>
+  </section>
+  
+
+  
+        <section class="sidebar-module">
+    <h4>Recent Posts</h4>
+    <ol class="list-unstyled">
+
+
+<li><a href="../../../test/2017/11/something-about-git/">Something about git</a></li>
+
+<li><a href="../../../test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></li>
+
+    </ol>
+  </section>
+
+  
+
+  
+  <section class="sidebar-module">
+    <h4>Links</h4>
+    <ol class="list-unstyled">
+      
+      <li><a href="https://example.org">Link 2</a></li>
+      
+    </ol>
+  </section>
+  
+</aside>
+
+
+      </div> <!-- /.row -->
+    </div> <!-- /.container -->
+
+    <footer class="blog-footer">
+      <p>
+      
+      Blog template created by <a href="https://twitter.com/mdo">@mdo</a>, ported to Hugo by <a href='https://twitter.com/mralanorth'>@mralanorth</a>.
+      
+      </p>
+      <p>
+      <a href="#">Back to top</a>
+      </p>
+    </footer>
+
+  </body>
+
+</html>

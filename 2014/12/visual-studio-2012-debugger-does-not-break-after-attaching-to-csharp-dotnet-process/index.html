@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta property="og:title" content="Visual Studio 2012 debugger does not break after attaching to C#/.NET process" />
+<meta property="og:description" content="I had from time to time issue debug C#/.NET applications in Visual Studio 2012 after attaching Visual Studio 2012 debugger to a process.
+Symptoms were that the debugger attached to the process but neither &lsquo;Break All&rsquo; worked. The same applied for any preset breakpoint.
+For some time I thought that Visual Studio installation for somehow corrupted on my system but since I was always able to workaround it via Debug.Assert() or Debugger." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/" />
+
+
+
+<meta property="article:published_time" content="2014-12-18T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2014-12-18T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Visual Studio 2012 debugger does not break after attaching to C#/.NET process"/>
+<meta name="twitter:description" content="I had from time to time issue debug C#/.NET applications in Visual Studio 2012 after attaching Visual Studio 2012 debugger to a process.
+Symptoms were that the debugger attached to the process but neither &lsquo;Break All&rsquo; worked. The same applied for any preset breakpoint.
+For some time I thought that Visual Studio installation for somehow corrupted on my system but since I was always able to workaround it via Debug.Assert() or Debugger."/>
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+    
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Visual Studio 2012 debugger does not break after attaching to C#/.NET process",
+  "url": "https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/",
+  "wordCount": "233",
+  "datePublished": "2014-12-18T00:00:00&#43;00:00",
+  "dateModified": "2014-12-18T00:00:00&#43;00:00",
+  "author": {
+    "@type": "Person",
+    "name": "Voloda"
+  },
+  "keywords": "development, dotNET"
+}
+</script>
+
+
+
+    <link rel="canonical" href="https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">
+
+    <title>Visual Studio 2012 debugger does not break after attaching to C#/.NET process | My personal notes</title>
+
+    <!-- combined, minified CSS -->
+    <link href="https://voloda.github.io/test/css/style.css" rel="stylesheet" integrity="sha384-O8wjsnz02XiyrPxnhfF6AVOv6YLBaEGRCnVF&#43;DL3gCPBy9cieyHcpixIrVyD2JS5" crossorigin="anonymous">
+
+    
+
+    
+
+    
+
+    
+
+  </head>
+
+  <body>
+
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="nav blog-nav">
+          <a class="nav-link " href="https://voloda.github.io/test/">Home</a>
+          
+          
+          <a class="nav-link" href="https://voloda.github.io/test/tutorials/chocolatey-setup-on-dev-machine-and-useful-packages/">Chocolatey setup on DEV machine &#43; useful packages</a>
+          
+          
+        </nav>
+      </div>
+    </div>
+
+    <header class="blog-header">
+      <div class="container">
+        <h1 class="blog-title"><a href="https://voloda.github.io/test/" rel="home">My personal notes</a></h1>
+        <p class="lead blog-description">My personal notes on various topics</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+
+          
+
+
+<article class="blog-post">
+  <header>
+    <h2 class="blog-post-title"><a href="https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></h2>
+    <p class="blog-post-meta"><time datetime="2014-12-18T00:00:00Z">Thu Dec 18, 2014</time> by Voloda in 
+
+<i class="fa fa-tag" aria-hidden="true"></i>&nbsp;<a href="../../../test/tags/development" rel="tag">development</a>, <a href="../../../test/tags/dotnet" rel="tag">dotNET</a>
+
+</p>
+  </header>
+  <p>I had from time to time issue debug C#/.NET applications in Visual Studio 2012 after attaching Visual Studio 2012 debugger to a process.</p>
+
+<p>Symptoms were that the debugger attached to the process but neither &lsquo;Break All&rsquo; worked. The same applied for any preset breakpoint.</p>
+
+<p>For some time I thought that Visual Studio installation for somehow corrupted on my system but since I was always able to workaround it via <code>Debug.Assert()</code> or <code>Debugger.Break()</code> calls put directly into code I had never motivation to really look for a solution nor reinstall the Visual Studio.</p>
+
+<p>Today I really wanted to attach to a process to see what is going on inside and the issue happened again.</p>
+
+<p>After a bit of playing I realized that in the case that debugger works after attaching correctly the &lsquo;Attach to Process&rsquo; Visual Studio dialog looks like this (see &lsquo;Attach to&rsquo; field):
+<img src="../../../img/visual-studio/visual_studio_debugger_does_recognize_process_type.png" alt="visual_studio_debugger_does_recognize_process_type.png" /></p>
+
+<p>For my process it didn&rsquo;t work this time and &lsquo;Attach to Process&rsquo; dialog looked like this (again see &lsquo;Attach to&rsquo; field):
+<img src="../../../img/visual-studio/visual_studio_debugger_does_not_recognize_process_type.png" alt="visual_studio_debugger_does_not_recognize_process_type.png" /></p>
+
+<p>Apparently Visual Studio in some cases does not properly detect the type of the process and does not use correct debugger settings.</p>
+
+<p>In order to solve my issue I finally found the &lsquo;Select&hellip;&rsquo; button following &lsquo;Attach to&rsquo; field where you can disable automatic detection of the process type and manually select a different one.</p>
+
+<p><img src="../../../img/visual-studio/visual_studio_debugger_does_not_recognize_process_select_code_type.png" alt="visual_studio_debugger_does_not_recognize_process_select_code_type.png " /></p>
+
+<p>After selecting &lsquo;Manager (v4.5, 4.0)&rsquo; and attaching debugger to process again everything worked well.</p>
+
+
+  
+
+  
+  <hr>
+  <footer>
+
+  
+    <section>
+    <h4>Share</h4>
+    <nav class="nav sharing-icons">
+      <a class="nav-item" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fvisual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process%2f" title="Share on Facebook"><span class="fa fa-facebook fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://plus.google.com/share?url=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fvisual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process%2f" title="Share on Google+"><span class="fa fa-google-plus fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fvisual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process%2f" title="Share on LinkedIn"><span class="fa fa-linkedin fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://twitter.com/home?status=https%3a%2f%2fvoloda.github.io%2ftest%2f2014%2f12%2fvisual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process%2f" title="Tweet this"><span class="fa fa-twitter fa-2x"></span></a>
+    </nav>
+  </section>
+
+  
+
+  
+  </footer>
+  
+
+</article> 
+
+
+
+        </div> <!-- /.blog-main -->
+
+        <aside class="col-sm-3 ml-auto blog-sidebar">
+  
+  <section class="sidebar-module sidebar-module-inset">
+    <h4>About</h4>
+    <p>My personal notes</p>
+  </section>
+  
+
+  
+        <section class="sidebar-module">
+    <h4>Recent Posts</h4>
+    <ol class="list-unstyled">
+
+
+<li><a href="../../../test/2017/11/something-about-git/">Something about git</a></li>
+
+<li><a href="../../../test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/">Visual Studio 2012 debugger does not break after attaching to C#/.NET process</a></li>
+
+    </ol>
+  </section>
+
+  
+
+  
+  <section class="sidebar-module">
+    <h4>Links</h4>
+    <ol class="list-unstyled">
+      
+      <li><a href="https://example.org">Link 2</a></li>
+      
+    </ol>
+  </section>
+  
+</aside>
+
+
+      </div> <!-- /.row -->
+    </div> <!-- /.container -->
+
+    <footer class="blog-footer">
+      <p>
+      
+      Blog template created by <a href="https://twitter.com/mdo">@mdo</a>, ported to Hugo by <a href='https://twitter.com/mralanorth'>@mralanorth</a>.
+      
+      </p>
+      <p>
+      <a href="#">Back to top</a>
+      </p>
+    </footer>
+
+  </body>
+
+</html>
