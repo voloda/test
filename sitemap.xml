@@ -3,79 +3,80 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://voloda.github.io/test/tutorials/</loc>
-    <lastmod>2017-11-14T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/2017/11/something-about-git/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/2017/11/something-about-git/</loc>
-    <lastmod>2017-11-02T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/notes/chocolatey/setup-on-dev-machine-and-useful-packages/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tutorials/chocolatey-setup-on-dev-machine-and-useful-packages/</loc>
-    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/2014/12/visual-studio-2012-debugger-does-not-break-after-attaching-to-csharp-dotnet-process/</loc>
-    <lastmod>2014-12-18T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/2014/12/how-to-release-unmanaged-library-loaded-into-managed-dotnet-code/</loc>
-    <lastmod>2014-12-03T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/2014/11/unity-registration-validator/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/2014/11/unity-registration-validator/</loc>
-    <lastmod>2014-11-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://voloda.github.io/test/categories/</loc>
+    <loc>https://voloda.github.io/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tags/chocolatey/</loc>
-    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/categories/chocolatey/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tags/codeproject/</loc>
-    <lastmod>2014-11-25T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/tags/codeproject/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tags/development/</loc>
-    <lastmod>2014-12-18T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/tags/development/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tags/dotnet/</loc>
-    <lastmod>2014-12-18T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/tags/dotnet/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/</loc>
-    <lastmod>2017-11-02T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/post/</loc>
-    <lastmod>2017-11-02T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/post/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://voloda.github.io/test/tags/</loc>
-    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+    <loc>https://voloda.github.io/tags/</loc>
+    <lastmod>2017-11-14T22:17:31+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://voloda.github.io/tutorials/</loc>
+    <lastmod>2017-11-15T00:38:36+01:00</lastmod>
     <priority>0</priority>
   </url>
   
